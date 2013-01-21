@@ -90,9 +90,11 @@ class SheerID:
 
     @classmethod
     def load_instance(cls, name):
-        cfg = cls.load_props()[name]
-        if cfg:
+        try:
+            cfg = cls.load_props()[name]
             return SheerID(cfg['access_token'], cfg['base_url'])
+        except KeyError:
+            return None
 
 class SheerIDRequest:
 
