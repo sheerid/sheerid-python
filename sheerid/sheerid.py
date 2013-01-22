@@ -36,7 +36,7 @@ class SheerID:
         self.verbose = verbose
         self.target_version = target_version
 
-    def get_access_token(self, request_id):
+    def issueToken(self, request_id):
         """Issue a token to facilitate an Asset upload via Upload."""
         json_object = self.post_json("/asset/token", {"requestId":request_id})
         return json_object.token
