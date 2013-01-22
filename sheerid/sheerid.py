@@ -54,6 +54,40 @@ class SheerID:
     def listVerificationTypes(self):
         return self.get_json('/verificationType')
 
+    def listRewardPools(self):
+        return self.get_json('/rewardPool')
+
+    def retrieveRewardPool(self, rewardPoolId):
+        return self.get_json('/rewardPool/%s' % str(rewardPoolId))
+
+    def createRewardPool(self, name, data, warnThreshold=None):
+        pools = self.listRewardPools()
+        if name in [x['name'] for x in pools]:
+            for pool in pools:
+                if pool['name'] == name:
+                    _id = pool['id']
+        else:
+            param = {'name':name}
+            if warnThreshold:
+                param['warnThreshold'] = warnThreshold
+            resp = self.post_json('/rewardPool', param)
+            _id = resp['id']
+        self.addEntries(_id, data)
+
+    def addEntries(self, rewardPoolId, data):
+        param = [('entry',d,) for d in data]
+        resource = '/rewardPool/%s' % str(rewardPoolId)
+        self.post(resource, param)
+
+    def listRewards(self):
+        return self.get_json('/reward')
+
+    def retrieveReward(self, rewardId):
+        return self.get_json('/reward/%s' % str(rewardId))
+
+    def createReward(self, name, rewardPoolId, instructions='TBD'):
+        self.post_json('/reward', {"name":name, "rewardPoolId":rewardPoolId, "instructions":instructions})
+
     def get(self, path, params=None):
         req = SheerIDRequest(self.access_token, 'GET', self.url(path), params, self.verbose)
         return req.execute()
