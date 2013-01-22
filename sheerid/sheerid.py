@@ -23,6 +23,8 @@ import os
 
 SHEERID_ENDPOINT_SANDBOX = "https://services-sandbox.sheerid.com"
 
+DEFAULT_CHUNK = 500
+
 class SheerID:
     """API Wrapper for accessing SheerID's RESTful interface."""
 
@@ -90,9 +92,11 @@ class SheerID:
 
     def addEntries(self, rewardPoolId, data):
         """Add one or more entries to a reward pool."""
-        param = [('entry',d,) for d in data]
         resource = '/rewardPool/%s' % str(rewardPoolId)
-        self.post(resource, param)
+        for d in [data[i:i+DEFAULT_CHUNK]
+                  for i in range(0, len(data), DEFAULT_CHUNK)]:
+            param = [('entry', x,) for x in d]
+            self.post(resource, param)
 
     def listRewards(self):
         """Obtain a list of existing rewards."""
