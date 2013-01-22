@@ -89,6 +89,7 @@ class SheerID:
             resp = self.post_json('/rewardPool', param)
             _id = resp['id']
         self.addEntries(_id, data)
+        return _id
 
     def addEntries(self, rewardPoolId, data):
         """Add one or more entries to a reward pool."""
@@ -106,9 +107,21 @@ class SheerID:
         """Retrieve a reward by its id."""
         return self.get_json('/reward/%s' % str(rewardId))
 
-    def createReward(self, name, rewardPoolId, instructions='TBD'):
-        """Create a reward to be distributed upon successful verification."""
-        self.post_json('/reward', {"name":name, "rewardPoolId":rewardPoolId, "instructions":instructions})
+    def createUnpooledReward(self, name, rewardCode, product_key_name, instructions=None):
+        """Create a single reward to be distributed upon successful
+        verification."""
+        param = {"name": name, product_key_name: rewardCode}
+        if instructions:
+            param["instructions"] = instructions
+        self.post_json('/reward', param)
+
+    def createPooledReward(self, name, rewardPoolId, product_key_name, instructions=None):
+        """Create a reward to be distributed upon successful verification,
+        drawn from the specified pool."""
+        param = {"name": name, product_key_name: 'pooled:%s'%rewardPoolId}
+        if instructions:
+            param["instructions"] = instructions
+        self.post_json('/reward', param)
 
     def get(self, path, params=None):
         req = SheerIDRequest(self.access_token, 'GET', self.url(path), params, self.verbose)
