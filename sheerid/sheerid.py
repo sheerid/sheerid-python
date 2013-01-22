@@ -26,41 +26,55 @@ SHEERID_ENDPOINT_SANDBOX = "https://services-sandbox.sheerid.com"
 class SheerID:
     """API Wrapper for accessing SheerID's RESTful interface."""
 
-    def __init__(self, access_token, base_url=SHEERID_ENDPOINT_SANDBOX, target_version="0.5", verbose=False):
+    def __init__(self, access_token, base_url=SHEERID_ENDPOINT_SANDBOX,
+                 target_version="0.5", verbose=False):
+        """Create an API access object using an API access token.
+        Can also specifiy a different endpoint such as production,
+        or a different version if necessary."""
         self.access_token = access_token
         self.base_url = base_url
         self.verbose = verbose
         self.target_version = target_version
 
     def get_access_token(self, request_id):
+        """Issue a token to facilitate an Asset upload via Upload."""
         json_object = self.post_json("/asset/token", {"requestId":request_id})
         return json_object.token
 
     def listAffiliationType(self):
+        """Obtain a list of affiliation types, optionally filtered by organization type."""
         return self.get_json('/affiliationType')
 
     def listAssetTypes(self):
+        """Obtain a list of asset types."""
         return self.get_json('/assetType')
 
     def listFields(self):
+        """Obtain a list of fields which can be supplied as inputs to Verify."""
         return self.get_json('/field')
 
     def listOrganizations(self, name='', type=''):
+        """List organizations, optionally filtered by type."""
         return self.get_json('/organization', {'name':name, 'type':type})
 
     def listOrganizationTypes(self):
+        """Obtain a list of organization types."""
         return self.get_json('/organizationType')
 
     def listVerificationTypes(self):
+        """Obtain a list of verification types."""
         return self.get_json('/verificationType')
 
     def listRewardPools(self):
+        """Obtain a list of reward pools."""
         return self.get_json('/rewardPool')
 
     def retrieveRewardPool(self, rewardPoolId):
+        """Retrieve a reward pool by id."""
         return self.get_json('/rewardPool/%s' % str(rewardPoolId))
 
     def createRewardPool(self, name, data, warnThreshold=None):
+        """Create a reward pool with initial reward data."""
         pools = self.listRewardPools()
         if name in [x['name'] for x in pools]:
             for pool in pools:
@@ -75,17 +89,21 @@ class SheerID:
         self.addEntries(_id, data)
 
     def addEntries(self, rewardPoolId, data):
+        """Add one or more entries to a reward pool."""
         param = [('entry',d,) for d in data]
         resource = '/rewardPool/%s' % str(rewardPoolId)
         self.post(resource, param)
 
     def listRewards(self):
+        """Obtain a list of existing rewards."""
         return self.get_json('/reward')
 
     def retrieveReward(self, rewardId):
+        """Retrieve a reward by its id."""
         return self.get_json('/reward/%s' % str(rewardId))
 
     def createReward(self, name, rewardPoolId, instructions='TBD'):
+        """Create a reward to be distributed upon successful verification."""
         self.post_json('/reward', {"name":name, "rewardPoolId":rewardPoolId, "instructions":instructions})
 
     def get(self, path, params=None):
