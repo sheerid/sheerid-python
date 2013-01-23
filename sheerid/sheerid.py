@@ -131,11 +131,18 @@ class SheerID:
         req = SheerIDRequest(self.access_token, 'POST', self.url(path), params, self.verbose)
         return req.execute()
 
+    def put(self, path, params=None):
+        req = SheerIDRequest(self.access_token, 'PUT', self.url(path), params, self.verbose)
+        return req.execute()
+
     def post_json(self, path, params=None):
         return json.loads(self.post(path, params))
 
     def get_json(self, path, params=None):
         return json.loads(self.get(path, params))
+
+    def put_json(self, path, params=None):
+        return json.loads(self.put(path, params))
 
     def url(self, path=''):
         return "%s/rest/%s%s" % (self.base_url, self.target_version, path)
@@ -179,15 +186,16 @@ class SheerIDRequest:
 
     def execute(self):
         d = urlencode(self.params)
-        if self.method == "POST":
-            post_data = d
-            url = self.url
-        else:
+        if self.method == "GET":
             post_data = None
             url = self.url + '?' + d
+        else:
+            post_data = d
+            url = self.url
         if self.verbose:
             print 'URL:', url
             print "Params:", d
         request = urllib2.Request(url, data=post_data, headers=self.headers)
+        request.get_method = lambda: self.method
         response = urllib2.urlopen(request)
         return response.read()
