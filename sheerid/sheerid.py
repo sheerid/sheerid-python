@@ -185,7 +185,7 @@ class SheerIDRequest:
         self.verbose = verbose
 
     def execute(self):
-        d = urlencode(self.params)
+        d = urlencode(self.params, True)
         if self.method == "GET":
             post_data = None
             url = self.url + '?' + d
