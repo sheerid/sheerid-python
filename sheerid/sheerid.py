@@ -136,13 +136,16 @@ class SheerID:
         return req.execute()
 
     def post_json(self, path, params=None):
-        return json.loads(self.post(path, params))
+        content = self.post(path, params)
+        return json.loads(content) if len(content) else None
 
     def get_json(self, path, params=None):
-        return json.loads(self.get(path, params))
+        content = self.get(path, params)
+        return json.loads(content) if len(content) else None
 
     def put_json(self, path, params=None):
-        return json.loads(self.put(path, params))
+        content = self.put(path, params)
+        return json.loads(content) if len(content) else None
 
     def url(self, path=''):
         return "%s/rest/%s%s" % (self.base_url, self.target_version, path)
