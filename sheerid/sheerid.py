@@ -47,6 +47,21 @@ class SheerID:
         """Obtain a list of affiliation types, optionally filtered by organization type."""
         return self.get_json('/affiliationType')
 
+    def getAssetData(self, assetId):
+        """Retrieve an asset in its original format."""
+        return self.get_json('/asset/%s/raw' % assetId)
+
+    def issueToken(self, requestId, lifespan=None):
+        """Issue a token to facilitate an Asset upload via Upload."""
+        params = {'requestId':requestId}
+        if lifespan:
+            params['lifespan'] = lifespan
+        return self.post_json('/asset/token', params)
+
+    def retrieveAsset(self, assetId):
+        """Retrieve an asset's metadata."""
+        return self.get_json('/asset/%s' % assetId)
+
     def listAssetTypes(self):
         """Obtain a list of asset types."""
         return self.get_json('/assetType')
