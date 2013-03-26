@@ -150,6 +150,10 @@ class SheerID:
         req = SheerIDRequest(self.access_token, 'PUT', self.url(path), params, self.verbose)
         return req.execute()
 
+    def delete(self, path):
+        req = SheerIDRequest(self.access_token, 'DELETE', self.url(path), None, self.verbose)
+        return req.execute()
+
     def post_json(self, path, params=None):
         content = self.post(path, params)
         return json.loads(content) if len(content) else None
