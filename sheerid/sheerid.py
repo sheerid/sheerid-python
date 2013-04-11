@@ -122,6 +122,22 @@ class SheerID:
         """Retrieve a reward by its id."""
         return self.get_json('/reward/%s' % str(rewardId))
 
+    def search_name(self, accountId, first_name, last_name):
+        """Search for requests with a combination of first and last name.
+        Note: accountId will be set to your accountId unless you have elevated privileges."""
+        p = {"firstName": first_name, "lastName": last_name}
+        if accountId:
+            p['accountId'] = accountId
+        return self.get_json('/verification/search', params=p)
+
+    def search_email(self, accountId, email_address):
+        """Search for requests with an email address
+        Note: accountId will be set to your accountId unless you have elevated privileges."""
+        p = {"email": email_address}
+        if accountId:
+            p['accountId'] = accountId
+        return self.get_json('/verification/search', params=p)
+
     def createUnpooledReward(self, name, rewardCode, product_key_name, instructions=None):
         """Create a single reward to be distributed upon successful
         verification."""
