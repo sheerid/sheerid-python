@@ -21,6 +21,7 @@ from urllib import urlencode
 import urllib2
 import os
 
+SHEERID_ENDPOINT_PRODUCTION = "https://services.sheerid.com"
 SHEERID_ENDPOINT_SANDBOX = "https://services-sandbox.sheerid.com"
 
 DEFAULT_CHUNK = 500
@@ -206,7 +207,7 @@ class SheerID:
     def load_instance(cls, name):
         try:
             cfg = cls.load_props()[name]
-            return SheerID(cfg['access_token'], cfg['base_url'])
+            return SheerID(cfg['access_token'], cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION))
         except KeyError:
             return None
 
