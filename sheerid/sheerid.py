@@ -204,10 +204,10 @@ class SheerID:
         return dicts
 
     @classmethod
-    def load_instance(cls, name):
+    def load_instance(cls, name, verbose=False):
         try:
             cfg = cls.load_props()[name]
-            return SheerID(cfg['access_token'], cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION))
+            return SheerID(cfg['access_token'], cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION), verbose=verbose)
         except KeyError:
             return None
 
