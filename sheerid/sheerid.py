@@ -39,6 +39,15 @@ class SheerID:
         self.verbose = verbose
         self.target_version = target_version
 
+    def __eq__(self, obj):
+        if not isinstance(obj, SheerID):
+            return false
+        else:
+            return self.access_token == obj.access_token and self.base_url == obj.base_url and self.target_version == obj.target_version
+
+    def __ne__(self, obj):
+        return not self == obj
+
     def issueToken(self, request_id):
         """Issue a token to facilitate an Asset upload via Upload."""
         json_object = self.post_json("/asset/token", {"requestId":request_id})
