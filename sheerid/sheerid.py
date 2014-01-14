@@ -135,7 +135,7 @@ class SheerID:
     def search_name(self, accountId, first_name, last_name):
         """Search for requests with a combination of first and last name.
         Note: accountId will be set to your accountId unless you have elevated privileges."""
-        p = {"firstName": first_name, "lastName": last_name}
+        p = {"first_name": first_name, "last_name": last_name}
         if accountId:
             p['accountId'] = accountId
         return self.get_json('/verification/search', params=p)
