@@ -132,7 +132,7 @@ class SheerID:
         """Retrieve a reward by its id."""
         return self.get_json('/reward/%s' % str(rewardId))
 
-    def getPerson(self, requestId):
+    def get_person(self, requestId):
         """Return the person entries for the specified request
         Note: call will fail unless you have elevated privileges."""
         return self.get_json('/verification/%s/person' % str(requestId))
