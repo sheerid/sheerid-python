@@ -153,6 +153,14 @@ class SheerID:
             p['accountId'] = accountId
         return self.get_json('/verification/search', params=p)
 
+    def search_metadata(self, accountId, meta_key, meta_value):
+        """Search for requests based on meta value
+        Note: accountId will be set to your accountId unless you have elevated privileges."""
+        p = {':%s' % meta_key: meta_value}
+        if accountId:
+            p['accountId'] = accountId
+        return self.get_json('/verification/search', params=p)
+
     def createUnpooledReward(self, name, rewardCode, product_key_name, instructions=None):
         """Create a single reward to be distributed upon successful
         verification."""
