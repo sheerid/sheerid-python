@@ -260,8 +260,10 @@ class SheerIDRequest:
             print 'URL:', url
             print "Params:", d
 
-        custom_ssl_context = None if self.secure else ssl._create_unverified_context()
         request = urllib2.Request(url, data=post_data, headers=self.headers)
         request.get_method = lambda: self.method
-        response = urllib2.urlopen(request, context=custom_ssl_context)
+        if not self.secure and '_create_unverified_context' in dir(ssl):
+            response = urllib2.urlopen(request, context=_create_unverified_context())
+        else:
+            response = urllib2.urlopen(request)
         return response.read()
