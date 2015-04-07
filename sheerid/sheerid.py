@@ -263,7 +263,7 @@ class SheerIDRequest:
         request = urllib2.Request(url, data=post_data, headers=self.headers)
         request.get_method = lambda: self.method
         if not self.secure and '_create_unverified_context' in dir(ssl):
-            response = urllib2.urlopen(request, context=_create_unverified_context())
+            response = urllib2.urlopen(request, context=ssl._create_unverified_context())
         else:
             response = urllib2.urlopen(request)
         return response.read()
