@@ -18,6 +18,7 @@
 
 import json
 from urllib import urlencode
+import ssl
 import urllib2
 import os
 
@@ -30,7 +31,7 @@ class SheerID:
     """API Wrapper for accessing SheerID's RESTful interface."""
 
     def __init__(self, access_token, base_url=SHEERID_ENDPOINT_SANDBOX,
-                 target_version="0.5", verbose=False):
+                 target_version="0.5", verbose=False, insecure=False):
         """Create an API access object using an API access token.
         Can also specifiy a different endpoint such as production,
         or a different version if necessary."""
@@ -38,6 +39,7 @@ class SheerID:
         self.base_url = base_url
         self.verbose = verbose
         self.target_version = target_version
+        self.insecure = insecure
 
     def __eq__(self, obj):
         if not isinstance(obj, SheerID):
@@ -178,19 +180,19 @@ class SheerID:
         self.post_json('/reward', param)
 
     def get(self, path, params=None):
-        req = SheerIDRequest(self.access_token, 'GET', self.url(path), params, self.verbose)
+        req = SheerIDRequest(self.access_token, 'GET', self.url(path), params, self.verbose, self.insecure)
         return req.execute()
 
     def post(self, path, params=None):
-        req = SheerIDRequest(self.access_token, 'POST', self.url(path), params, self.verbose)
+        req = SheerIDRequest(self.access_token, 'POST', self.url(path), params, self.verbose, self.insecure)
         return req.execute()
 
     def put(self, path, params=None):
-        req = SheerIDRequest(self.access_token, 'PUT', self.url(path), params, self.verbose)
+        req = SheerIDRequest(self.access_token, 'PUT', self.url(path), params, self.verbose, self.insecure)
         return req.execute()
 
     def delete(self, path):
-        req = SheerIDRequest(self.access_token, 'DELETE', self.url(path), None, self.verbose)
+        req = SheerIDRequest(self.access_token, 'DELETE', self.url(path), None, self.verbose, self.insecure)
         return req.execute()
 
     def post_json(self, path, params=None):
@@ -226,16 +228,16 @@ class SheerID:
         return dicts
 
     @classmethod
-    def load_instance(cls, name, verbose=False):
+    def load_instance(cls, name, verbose=False, insecure=False):
         try:
             cfg = cls.load_props()[name]
-            return SheerID(cfg['access_token'], cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION), verbose=verbose)
+            return SheerID(cfg['access_token'], cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION), verbose=verbose, insecure=insecure)
         except KeyError:
             return None
 
 class SheerIDRequest:
 
-    def __init__(self, accessToken, method, url, params=None, verbose=False):
+    def __init__(self, accessToken, method, url, params=None, verbose=False, insecure=False):
         self.method = method
         self.url = url
         if params:
@@ -244,6 +246,7 @@ class SheerIDRequest:
             self.params = dict()
         self.headers = {"Authorization":"Bearer %s" % accessToken}
         self.verbose = verbose
+        self.secure = not insecure
 
     def execute(self):
         d = urlencode(self.params, True)
@@ -256,7 +259,11 @@ class SheerIDRequest:
         if self.verbose:
             print 'URL:', url
             print "Params:", d
+
         request = urllib2.Request(url, data=post_data, headers=self.headers)
         request.get_method = lambda: self.method
-        response = urllib2.urlopen(request)
+        if not self.secure and '_create_unverified_context' in dir(ssl):
+            response = urllib2.urlopen(request, context=_create_unverified_context())
+        else:
+            response = urllib2.urlopen(request)
         return response.read()
