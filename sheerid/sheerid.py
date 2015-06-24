@@ -212,7 +212,8 @@ class SheerID:
 
     @classmethod
     def load_props(cls):
-        propFile = file( os.environ.get("HOME") + "/.sheerid", "rU" )
+        creds = os.environ.get('SHEERID_CREDENTIALS_FILE', os.environ.get("HOME") + "/.sheerid")
+        propFile = file(creds, "rU" )
         dicts = dict()
         for propLine in propFile:
             if propLine[0] == '[':
