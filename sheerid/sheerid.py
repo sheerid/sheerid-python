@@ -248,12 +248,23 @@ class SheerIDRequest:
         self.verbose = verbose
         self.secure = not insecure
 
+    def utf8_params(self):
+        unicode_dict = {}
+        for k, v in self.params.iteritems():
+            if isinstance(v, unicode):
+                v = v.encode('utf8')
+            elif isinstance(v, str):
+                v.decode('utf8')
+            unicode_dict[k] = v
+        return unicode_dict
+
     def execute(self):
-        d = urlencode(self.params, True)
+        d = urlencode(self.utf8_params(), True)
         if self.method == "GET":
             post_data = None
             url = self.url + '?' + d
         else:
+            self.headers["Content-Type"] = "application/x-www-form-urlencoded; charset=utf-8"
             post_data = d
             url = self.url
         if self.verbose:
