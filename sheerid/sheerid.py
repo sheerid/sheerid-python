@@ -231,6 +231,7 @@ class SheerID:
     def load_instance(cls, name, verbose=False, insecure=False):
         try:
             cfg = cls.load_props()[name]
+            insecure = insecure or ('true' == cfg.get('insecure'))
             return SheerID(cfg['access_token'], cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION), verbose=verbose, insecure=insecure)
         except KeyError:
             return None
