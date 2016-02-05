@@ -21,11 +21,14 @@ from urllib import urlencode
 import ssl
 import urllib2
 import os
+import re
 
 SHEERID_ENDPOINT_PRODUCTION = "https://services.sheerid.com"
 SHEERID_ENDPOINT_SANDBOX = "https://services-sandbox.sheerid.com"
 
 DEFAULT_CHUNK = 500
+
+PATTERN_VALID_INSTANCE_NAME = '^[\w-]+$'
 
 class SheerID:
     """API Wrapper for accessing SheerID's RESTful interface."""
@@ -211,7 +214,24 @@ class SheerID:
         return "%s/rest/%s%s" % (self.base_url, self.target_version, path)
 
     @classmethod
-    def load_props(cls):
+    def load_props(cls, name):
+        filename = "{0}/.sheerid.d/{1}".format(os.environ.get("HOME"), name)
+        if not os.path.isfile(filename):
+            return None
+        propFile = file(filename, "rU")
+        propDict = dict()
+        for propLine in propFile:
+            if propLine[0] == '#':
+                continue
+            parts = propLine.split('=', 1)
+            if len(parts) == 2:
+                name = parts[0].strip()
+                value = parts[1].strip()
+                propDict[name] = value
+        return propDict
+
+    @classmethod
+    def load_props_file(cls):
         propFile = file( os.environ.get("HOME") + "/.sheerid", "rU" )
         dicts = dict()
         for propLine in propFile:
@@ -229,8 +249,13 @@ class SheerID:
 
     @classmethod
     def load_instance(cls, name, verbose=False, insecure=False):
+        if not re.match(PATTERN_VALID_INSTANCE_NAME, name):
+            return None
         try:
-            cfg = cls.load_props()[name]
+            cfg = cls.load_props(name)
+            if not cfg:
+                cfg = cls.load_props_file()[name]
+            insecure = insecure or ('true' == cfg.get('insecure'))
             return SheerID(cfg['access_token'], cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION), verbose=verbose, insecure=insecure)
         except KeyError:
             return None
