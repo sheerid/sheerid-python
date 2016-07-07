@@ -25,6 +25,7 @@ import re
 
 SHEERID_ENDPOINT_PRODUCTION = "https://services.sheerid.com"
 SHEERID_ENDPOINT_SANDBOX = "https://services-sandbox.sheerid.com"
+REST_VERSION = "0.5"
 
 DEFAULT_CHUNK = 500
 
@@ -34,7 +35,7 @@ class SheerID:
     """API Wrapper for accessing SheerID's RESTful interface."""
 
     def __init__(self, access_token, base_url=SHEERID_ENDPOINT_SANDBOX,
-                 target_version="0.5", verbose=False, insecure=False):
+                 target_version=REST_VERSION, verbose=False, insecure=False):
         """Create an API access object using an API access token.
         Can also specifiy a different endpoint such as production,
         or a different version if necessary."""
@@ -256,7 +257,8 @@ class SheerID:
             if not cfg:
                 cfg = cls.load_props_file()[name]
             insecure = insecure or ('true' == cfg.get('insecure'))
-            return SheerID(cfg['access_token'], cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION), verbose=verbose, insecure=insecure)
+            target_version = cfg.get('target_version', REST_VERSION)
+            return SheerID(cfg['access_token'], cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION), verbose=verbose, insecure=insecure, target_version=target_version)
         except KeyError:
             return None
 
