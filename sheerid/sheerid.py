@@ -182,32 +182,32 @@ class SheerID:
             param["instructions"] = instructions
         self.post_json('/reward', param)
 
-    def get(self, path, params=None):
-        req = SheerIDRequest(self.access_token, 'GET', self.url(path), params, self.verbose, self.insecure)
+    def get(self, path, params=None, headers={}):
+        req = SheerIDRequest(self.access_token, 'GET', self.url(path), params, self.verbose, self.insecure, headers)
         return req.execute()
 
-    def post(self, path, params=None):
-        req = SheerIDRequest(self.access_token, 'POST', self.url(path), params, self.verbose, self.insecure)
+    def post(self, path, params=None, headers={}):
+        req = SheerIDRequest(self.access_token, 'POST', self.url(path), params, self.verbose, self.insecure, headers)
         return req.execute()
 
-    def put(self, path, params=None):
-        req = SheerIDRequest(self.access_token, 'PUT', self.url(path), params, self.verbose, self.insecure)
+    def put(self, path, params=None, headers={}):
+        req = SheerIDRequest(self.access_token, 'PUT', self.url(path), params, self.verbose, self.insecure, headers)
         return req.execute()
 
-    def delete(self, path):
-        req = SheerIDRequest(self.access_token, 'DELETE', self.url(path), None, self.verbose, self.insecure)
+    def delete(self, path, headers={}):
+        req = SheerIDRequest(self.access_token, 'DELETE', self.url(path), None, self.verbose, self.insecure, headers)
         return req.execute()
 
-    def post_json(self, path, params=None):
-        content = self.post(path, params)
+    def post_json(self, path, params=None, headers={}):
+        content = self.post(path, params, headers)
         return json.loads(content) if len(content) else None
 
-    def get_json(self, path, params=None):
-        content = self.get(path, params)
+    def get_json(self, path, params=None, headers={}):
+        content = self.get(path, params, headers)
         return json.loads(content) if len(content) else None
 
-    def put_json(self, path, params=None):
-        content = self.put(path, params)
+    def put_json(self, path, params=None, headers={}):
+        content = self.put(path, params, headers)
         return json.loads(content) if len(content) else None
 
     def url(self, path=''):
@@ -262,14 +262,15 @@ class SheerID:
 
 class SheerIDRequest:
 
-    def __init__(self, accessToken, method, url, params=None, verbose=False, insecure=False):
+    def __init__(self, accessToken, method, url, params=None, verbose=False, insecure=False, headers={}):
         self.method = method
         self.url = url
         if params:
             self.params = params
         else:
             self.params = dict()
-        self.headers = {"Authorization":"Bearer %s" % accessToken}
+        self.headers = headers
+        self.headers["Authorization"] = "Bearer %s" % accessToken
         self.verbose = verbose
         self.secure = not insecure
 
