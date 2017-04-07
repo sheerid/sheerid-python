@@ -186,28 +186,28 @@ class SheerID:
         req = SheerIDRequest(self.access_token, 'GET', self.url(path), params, self.verbose, self.insecure, headers)
         return req.execute()
 
-    def post(self, path, params=None, headers={}):
-        req = SheerIDRequest(self.access_token, 'POST', self.url(path), params, self.verbose, self.insecure, headers)
+    def post(self, path, params=None, headers={}, request_body=None):
+        req = SheerIDRequest(self.access_token, 'POST', self.url(path), params, self.verbose, self.insecure, headers, request_body)
         return req.execute()
 
-    def put(self, path, params=None, headers={}):
-        req = SheerIDRequest(self.access_token, 'PUT', self.url(path), params, self.verbose, self.insecure, headers)
+    def put(self, path, params=None, headers={}, request_body=None):
+        req = SheerIDRequest(self.access_token, 'PUT', self.url(path), params, self.verbose, self.insecure, headers, request_body)
         return req.execute()
 
     def delete(self, path, headers={}):
         req = SheerIDRequest(self.access_token, 'DELETE', self.url(path), None, self.verbose, self.insecure, headers)
         return req.execute()
 
-    def post_json(self, path, params=None, headers={}):
-        content = self.post(path, params, headers)
+    def post_json(self, path, params=None, headers={}, request_body=None):
+        content = self.post(path, params, headers, request_body)
         return json.loads(content) if len(content) else None
 
     def get_json(self, path, params=None, headers={}):
         content = self.get(path, params, headers)
         return json.loads(content) if len(content) else None
 
-    def put_json(self, path, params=None, headers={}):
-        content = self.put(path, params, headers)
+    def put_json(self, path, params=None, headers={}, request_body=None):
+        content = self.put(path, params, headers, request_body)
         return json.loads(content) if len(content) else None
 
     def url(self, path=''):
@@ -262,7 +262,7 @@ class SheerID:
 
 class SheerIDRequest:
 
-    def __init__(self, accessToken, method, url, params=None, verbose=False, insecure=False, headers={}):
+    def __init__(self, accessToken, method, url, params=None, verbose=False, insecure=False, headers={}, request_body=None):
         self.method = method
         self.url = url
         if params:
@@ -273,6 +273,7 @@ class SheerIDRequest:
         self.headers["Authorization"] = "Bearer %s" % accessToken
         self.verbose = verbose
         self.secure = not insecure
+        self.request_body = request_body
 
     def utf8_params(self):
         unicode_dict = {}
@@ -290,14 +291,18 @@ class SheerIDRequest:
             post_data = None
             url = self.url + '?' + d
         else:
-            self.headers["Content-Type"] = "application/x-www-form-urlencoded; charset=utf-8"
-            post_data = d
             url = self.url
+            if not self.request_body:
+                self.headers["Content-Type"] = "application/x-www-form-urlencoded; charset=utf-8"
+                self.request_body = d
         if self.verbose:
             print 'URL:', url
-            print "Params:", d
+            print 'Headers:', self.headers
+            if self.request_body:
+                print 'Request Body:'
+                print self.request_body
 
-        request = urllib2.Request(url, data=post_data, headers=self.headers)
+        request = urllib2.Request(url, data=self.request_body, headers=self.headers)
         request.get_method = lambda: self.method
         if not self.secure and '_create_unverified_context' in dir(ssl):
             response = urllib2.urlopen(request, context=ssl._create_unverified_context())
