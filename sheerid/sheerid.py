@@ -288,7 +288,6 @@ class SheerIDRequest:
     def execute(self):
         d = urlencode(self.utf8_params(), True)
         if self.method == "GET":
-            post_data = None
             url = self.url + '?' + d
         else:
             url = self.url
