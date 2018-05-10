@@ -248,27 +248,33 @@ class SheerID:
         return dicts
 
     @classmethod
-    def load_instance(cls, name, account, verbose=False, insecure=False):
-        if not re.match(PATTERN_VALID_INSTANCE_NAME, name):
+    def load_instance(cls, name, verbose=False, insecure=False):
+        names = name.split(":")
+        master = names[0]
+        puppet = None
+        if len(names) > 1:
+            puppet = names[1]
+
+        if not re.match(PATTERN_VALID_INSTANCE_NAME, master):
             return None
         try:
-            cfg = cls.load_props(name)
+            cfg = cls.load_props(master)
             if not cfg:
-                cfg = cls.load_props_file()[name]
+                cfg = cls.load_props_file()[master]
 
             insecure = insecure or ('true' == cfg.get('insecure'))
             access_token = cfg['access_token']
 
-            if account is not None:
+            if puppet is not None:
                 try:
-                    pcfg = cls.load_props_file()[account]
+                    pcfg = cls.load_props_file()[puppet]
 
                     account_name = pcfg['account_name']
                     if account_name:
                         access_token += ('/' + account_name)
 
                 except KeyError:
-                    access_token += ('/' + account)
+                    access_token += ('/' + puppet)
 
             return SheerID(access_token, cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION), verbose=verbose, insecure=insecure)
         except KeyError:
