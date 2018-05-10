@@ -248,7 +248,7 @@ class SheerID:
         return dicts
 
     @classmethod
-    def load_instance(cls, name, verbose=False, insecure=False):
+    def load_instance(cls, name, accountName, verbose=False, insecure=False):
         if not re.match(PATTERN_VALID_INSTANCE_NAME, name):
             return None
         try:
@@ -256,7 +256,8 @@ class SheerID:
             if not cfg:
                 cfg = cls.load_props_file()[name]
             insecure = insecure or ('true' == cfg.get('insecure'))
-            return SheerID(cfg['access_token'], cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION), verbose=verbose, insecure=insecure)
+            access_token = cfg['access_token'] if accountName is None else cfg['access_token'] + '/' + accountName
+            return SheerID(access_token, cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION), verbose=verbose, insecure=insecure)
         except KeyError:
             return None
 
