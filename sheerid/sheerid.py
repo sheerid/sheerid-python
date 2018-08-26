@@ -28,7 +28,7 @@ SHEERID_ENDPOINT_SANDBOX = "https://services-sandbox.sheerid.com"
 
 DEFAULT_CHUNK = 500
 
-PATTERN_VALID_INSTANCE_NAME = '^(?=.*[A-Za-z0-9])[A-Za-z0-9@\.\+_]+$'
+PATTERN_VALID_INSTANCE_NAME = '^(?=.*[A-Za-z0-9])[A-Za-z0-9@\.\+\-_]+$'
 
 class SheerID:
     """API Wrapper for accessing SheerID's RESTful interface."""
