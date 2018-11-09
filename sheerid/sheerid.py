@@ -275,6 +275,8 @@ class SheerID:
 
                 except KeyError:
                     access_token += ('/' + puppet)
+                except IOError:
+                    access_token += ('/' + puppet)
 
             return SheerID(access_token, cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION), verbose=verbose, insecure=insecure)
         except KeyError:
