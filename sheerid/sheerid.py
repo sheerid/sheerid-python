@@ -46,7 +46,7 @@ class SheerID:
 
     def __eq__(self, obj):
         if not isinstance(obj, SheerID):
-            return false
+            return False
         else:
             return self.access_token == obj.access_token and self.base_url == obj.base_url and self.target_version == obj.target_version
 
