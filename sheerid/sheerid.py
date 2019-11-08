@@ -23,7 +23,6 @@ import urllib2
 import os
 import re
 
-SHEERID_ENDPOINT_PRODUCTION = "https://services.sheerid.com"
 SHEERID_ENDPOINT_SANDBOX = "https://services-sandbox.sheerid.com"
 
 DEFAULT_CHUNK = 500
@@ -262,6 +261,11 @@ class SheerID:
             if not cfg:
                 cfg = cls.load_props_file()[master]
 
+            base_url = cfg.get('base_url')
+            if base_url is None:
+                print "base_url not found"
+                return None
+
             insecure = insecure or ('true' == cfg.get('insecure'))
             access_token = cfg['access_token']
 
@@ -278,7 +282,7 @@ class SheerID:
                 except IOError:
                     access_token += ('/' + puppet)
 
-            return SheerID(access_token, cfg.get('base_url', SHEERID_ENDPOINT_PRODUCTION), verbose=verbose, insecure=insecure)
+            return SheerID(access_token, base_url, verbose=verbose, insecure=insecure)
         except KeyError:
             return None
 
