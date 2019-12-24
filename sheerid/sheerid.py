@@ -263,7 +263,7 @@ class SheerID:
 
             base_url = cfg.get('base_url')
             if base_url is None:
-                print "base_url not found"
+                print ("base_url not found")
                 return None
 
             insecure = insecure or ('true' == cfg.get('insecure'))
@@ -321,11 +321,11 @@ class SheerIDRequest:
                 self.headers["Content-Type"] = "application/x-www-form-urlencoded; charset=utf-8"
                 self.request_body = d
         if self.verbose:
-            print 'URL:', url
-            print 'Headers:', self.headers
+            print ('URL:', url)
+            print ('Headers:', self.headers)
             if self.request_body:
-                print 'Request Body:'
-                print self.request_body
+                print ('Request Body:')
+                print (self.request_body)
 
         request = urllib2.Request(url, data=self.request_body, headers=self.headers)
         request.get_method = lambda: self.method
