@@ -304,8 +304,8 @@ class SheerIDRequest:
     def utf8_params(self):
         unicode_dict = {}
         for k, v in self.params.items():
-            if isinstance(v, str):
-                v.decode('utf8')
+            if isinstance(v, bytes) or isinstance(v, bytearray):
+                v = v.decode('utf8')
             unicode_dict[k] = v
         return unicode_dict
 
