@@ -250,17 +250,17 @@ class SheerID:
     @classmethod
     def load_instance(cls, name, verbose=False, insecure=False):
         names = name.split(":")
-        master = names[0]
+        primary = names[0]
         puppet = None
         if len(names) > 1:
             puppet = names[1]
 
-        if not re.match(PATTERN_VALID_INSTANCE_NAME, master):
+        if not re.match(PATTERN_VALID_INSTANCE_NAME, primary):
             return None
         try:
-            cfg = cls.load_props(master)
+            cfg = cls.load_props(primary)
             if not cfg:
-                cfg = cls.load_props_file()[master]
+                cfg = cls.load_props_file()[primary]
 
             insecure = insecure or ('true' == cfg.get('insecure'))
             access_token = cfg['access_token']
