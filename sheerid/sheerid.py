@@ -16,6 +16,7 @@
 # http://developer.sheerid.com
 
 
+from loader import PropLoader
 import json
 from urllib import urlencode
 import ssl
@@ -214,40 +215,6 @@ class SheerID:
         return "%s/rest/%s%s" % (self.base_url, self.target_version, path)
 
     @classmethod
-    def load_props(cls, name):
-        filename = "{0}/.sheerid.d/{1}".format(os.environ.get("HOME"), name)
-        if not os.path.isfile(filename):
-            return None
-        propFile = file(filename, "rU")
-        propDict = dict()
-        for propLine in propFile:
-            if propLine[0] == '#':
-                continue
-            parts = propLine.split('=', 1)
-            if len(parts) == 2:
-                name = parts[0].strip()
-                value = parts[1].strip()
-                propDict[name] = value
-        return propDict
-
-    @classmethod
-    def load_props_file(cls):
-        propFile = file( os.environ.get("HOME") + "/.sheerid", "rU" )
-        dicts = dict()
-        for propLine in propFile:
-            if propLine[0] == '[':
-                propDict = dict()
-                dicts[propLine.strip('[] \n\r')] = propDict
-            else:
-                parts = propLine.split('=', 1)
-                if len(parts) == 2:
-                    name = parts[0].strip()
-                    value = parts[1].strip()
-                    propDict[name] = value
-        propFile.close()
-        return dicts
-
-    @classmethod
     def load_instance(cls, name, verbose=False, insecure=False):
         names = name.split(":")
         master = names[0]
@@ -258,9 +225,9 @@ class SheerID:
         if not re.match(PATTERN_VALID_INSTANCE_NAME, master):
             return None
         try:
-            cfg = cls.load_props(master)
+            cfg = PropLoader.load_props(master)
             if not cfg:
-                cfg = cls.load_props_file()[master]
+                cfg = PropLoader.load_props_file()[master]
 
             insecure = insecure or ('true' == cfg.get('insecure'))
             access_token = cfg['access_token']
