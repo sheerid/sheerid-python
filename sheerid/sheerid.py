@@ -238,7 +238,7 @@ class SheerID:
 
             if puppet is not None:
                 try:
-                    pcfg = cls.load_props_file()[puppet]
+                    pcfg = PropLoader.load_props_file()[puppet]
 
                     account_name = pcfg['account_name']
                     if account_name:
