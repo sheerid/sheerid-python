@@ -16,19 +16,20 @@
 # http://developer.sheerid.com
 
 
-from loader import PropLoader
 import json
-from urllib import urlencode
-import ssl
-import urllib2
-import os
 import re
+import ssl
+from urllib.parse import urlencode
+from urllib.request import urlopen, Request
+
+from loader import PropLoader
 
 SHEERID_ENDPOINT_SANDBOX = "https://services-sandbox.sheerid.com"
 
 DEFAULT_CHUNK = 500
 
 PATTERN_VALID_INSTANCE_NAME = '^(?=.*[A-Za-z0-9])[A-Za-z0-9@\.\+\-_]+$'
+
 
 class SheerID:
     """API Wrapper for accessing SheerID's RESTful interface."""
@@ -55,7 +56,7 @@ class SheerID:
 
     def issueToken(self, request_id):
         """Issue a token to facilitate an Asset upload via Upload."""
-        json_object = self.post_json("/asset/token", {"requestId":request_id})
+        json_object = self.post_json("/asset/token", {"requestId": request_id})
         return json_object.token
 
     def listAffiliationType(self):
@@ -68,7 +69,7 @@ class SheerID:
 
     def issueToken(self, requestId, lifespan=None):
         """Issue a token to facilitate an Asset upload via Upload."""
-        params = {'requestId':requestId}
+        params = {'requestId': requestId}
         if lifespan:
             params['lifespan'] = lifespan
         return self.post_json('/asset/token', params)
@@ -87,7 +88,7 @@ class SheerID:
 
     def listOrganizations(self, name='', type=''):
         """List organizations, optionally filtered by type."""
-        return self.get_json('/organization', {'name':name, 'type':type})
+        return self.get_json('/organization', {'name': name, 'type': type})
 
     def listOrganizationTypes(self):
         """Obtain a list of organization types."""
@@ -113,7 +114,7 @@ class SheerID:
                 if pool['name'] == name:
                     _id = pool['id']
         else:
-            param = {'name':name}
+            param = {'name': name}
             if warnThreshold:
                 param['warnThreshold'] = warnThreshold
             resp = self.post_json('/rewardPool', param)
@@ -124,7 +125,7 @@ class SheerID:
     def addEntries(self, rewardPoolId, data):
         """Add one or more entries to a reward pool."""
         resource = '/rewardPool/%s' % str(rewardPoolId)
-        for d in [data[i:i+DEFAULT_CHUNK]
+        for d in [data[i:i + DEFAULT_CHUNK]
                   for i in range(0, len(data), DEFAULT_CHUNK)]:
             param = [('entry', x,) for x in d]
             self.post(resource, param)
@@ -177,7 +178,7 @@ class SheerID:
     def createPooledReward(self, name, rewardPoolId, product_key_name, instructions=None):
         """Create a reward to be distributed upon successful verification,
         drawn from the specified pool."""
-        param = {"name": name, product_key_name: 'pooled:%s'%rewardPoolId}
+        param = {"name": name, product_key_name: 'pooled:%s' % rewardPoolId}
         if instructions:
             param["instructions"] = instructions
         self.post_json('/reward', param)
@@ -187,11 +188,13 @@ class SheerID:
         return req.execute()
 
     def post(self, path, params=None, headers={}, request_body=None):
-        req = SheerIDRequest(self.access_token, 'POST', self.url(path), params, self.verbose, self.insecure, headers, request_body)
+        req = SheerIDRequest(self.access_token, 'POST', self.url(path), params, self.verbose, self.insecure, headers,
+                             request_body)
         return req.execute()
 
     def put(self, path, params=None, headers={}, request_body=None):
-        req = SheerIDRequest(self.access_token, 'PUT', self.url(path), params, self.verbose, self.insecure, headers, request_body)
+        req = SheerIDRequest(self.access_token, 'PUT', self.url(path), params, self.verbose, self.insecure, headers,
+                             request_body)
         return req.execute()
 
     def delete(self, path, headers={}):
@@ -230,7 +233,7 @@ class SheerID:
 
             base_url = cfg.get('base_url')
             if base_url is None:
-                print "base_url not found"
+                print("base_url not found")
                 return None
 
             insecure = insecure or ('true' == cfg.get('insecure'))
@@ -253,9 +256,11 @@ class SheerID:
         except KeyError:
             return None
 
+
 class SheerIDRequest:
 
-    def __init__(self, accessToken, method, url, params=None, verbose=False, insecure=False, headers={}, request_body=None):
+    def __init__(self, accessToken, method, url, params=None, verbose=False, insecure=False, headers={},
+                 request_body=None):
         self.method = method
         self.url = url
         if params:
@@ -270,11 +275,9 @@ class SheerIDRequest:
 
     def utf8_params(self):
         unicode_dict = {}
-        for k, v in self.params.iteritems():
-            if isinstance(v, unicode):
+        for k, v in list(self.params.items()):
+            if isinstance(v, str):
                 v = v.encode('utf8')
-            elif isinstance(v, str):
-                v.decode('utf8')
             unicode_dict[k] = v
         return unicode_dict
 
@@ -288,16 +291,16 @@ class SheerIDRequest:
                 self.headers["Content-Type"] = "application/x-www-form-urlencoded; charset=utf-8"
                 self.request_body = d
         if self.verbose:
-            print 'URL:', url
-            print 'Headers:', self.headers
+            print('URL:', url)
+            print('Headers:', self.headers)
             if self.request_body:
-                print 'Request Body:'
-                print self.request_body
+                print('Request Body:')
+                print(self.request_body)
 
-        request = urllib2.Request(url, data=self.request_body, headers=self.headers)
+        request = Request(url, data=self.request_body, headers=self.headers)
         request.get_method = lambda: self.method
         if not self.secure and '_create_unverified_context' in dir(ssl):
-            response = urllib2.urlopen(request, context=ssl._create_unverified_context())
+            response = urlopen(request, context=ssl._create_unverified_context())
         else:
-            response = urllib2.urlopen(request)
+            response = urlopen(request)
         return response.read()
