@@ -18,9 +18,12 @@
 
 from loader import PropLoader
 import json
-from urllib import urlencode
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
 import ssl
-import urllib2
+from urllib.request import urlopen, Request
 import os
 import re
 
@@ -230,7 +233,7 @@ class SheerID:
 
             base_url = cfg.get('base_url')
             if base_url is None:
-                print "base_url not found"
+                print("base_url not found")
                 return None
 
             insecure = insecure or ('true' == cfg.get('insecure'))
@@ -270,7 +273,7 @@ class SheerIDRequest:
 
     def utf8_params(self):
         unicode_dict = {}
-        for k, v in self.params.iteritems():
+        for k, v in self.params.items():
             if isinstance(v, unicode):
                 v = v.encode('utf8')
             elif isinstance(v, str):
@@ -288,16 +291,16 @@ class SheerIDRequest:
                 self.headers["Content-Type"] = "application/x-www-form-urlencoded; charset=utf-8"
                 self.request_body = d
         if self.verbose:
-            print 'URL:', url
-            print 'Headers:', self.headers
+            print('URL:', url)
+            print('Headers:', self.headers)
             if self.request_body:
-                print 'Request Body:'
-                print self.request_body
+                print('Request Body:')
+                print(self.request_body)
 
-        request = urllib2.Request(url, data=self.request_body, headers=self.headers)
+        request = Request(url, data=self.request_body, headers=self.headers)
         request.get_method = lambda: self.method
         if not self.secure and '_create_unverified_context' in dir(ssl):
-            response = urllib2.urlopen(request, context=ssl._create_unverified_context())
+            response = urlopen(request, context=ssl._create_unverified_context())
         else:
-            response = urllib2.urlopen(request)
+            response = urlopen(request)
         return response.read()
