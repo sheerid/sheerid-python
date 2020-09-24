@@ -287,7 +287,7 @@ class SheerIDRequest:
             url = self.url
             if not self.request_body:
                 self.headers["Content-Type"] = "application/x-www-form-urlencoded; charset=utf-8"
-                self.request_body = d
+                self.request_body = d.encode("utf-8")
         if self.verbose:
             print('URL:', url)
             print('Headers:', self.headers)
