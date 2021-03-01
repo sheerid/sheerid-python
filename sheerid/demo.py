@@ -25,25 +25,25 @@ def demonstrate(key):
     api = SheerID(key, verbose=True)
 
     response = api.get('/ping')
-    print 'Expected response "pong":', response
+    print('Expected response "pong":', response)
 
     response = api.get('/organizationType')
-    print 'Org Types:', str(response)
+    print('Org Types:', str(response))
 
     response = api.post('/verification', params={"FIRST_NAME":"Test","LAST_NAME":"User","SSN_LAST4":"1234"})
     r_obj = json.loads(response)
-    print 'Verification response:', r_obj['result']
+    print('Verification response:', r_obj['result'])
 
     response = api.listOrganizations(name='Reserve',type="MILITARY")
     orgs = ', '.join(map(itemgetter('name'), response))
-    print 'Reserve Military Organizations:', orgs
+    print('Reserve Military Organizations:', orgs)
 
 
 if __name__ == "__main__":
     import sys
     if len(sys.argv) != 2:
-        print "Please provide a valid API key for your account"
-        print "Usage: python demo.py <API_KEY>"
+        print("Please provide a valid API key for your account")
+        print("Usage: python demo.py <API_KEY>")
         sys.exit(1)
     key = sys.argv[1]
     demonstrate(key)
