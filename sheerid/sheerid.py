@@ -185,7 +185,11 @@ class SheerID:
 
     def get(self, path, params=None, headers={}):
         req = SheerIDRequest(self.access_token, 'GET', self.url(path), params, self.verbose, self.insecure, headers)
-        return req.execute().decode('utf-8')
+        response = req.execute()
+        try:
+            return response.decode('utf-8')
+        except:
+            return response
 
     def post(self, path, params=None, headers={}, request_body=None):
         req = SheerIDRequest(self.access_token, 'POST', self.url(path), params, self.verbose, self.insecure, headers,
