@@ -25,6 +25,8 @@ class PropLoader:
     @classmethod
     def load_props(cls, name):
         filename = "{0}/.sheerid.d/{1}".format(os.environ.get("HOME"), name)
+        print("Home is {}".format(os.environ.get("HOME")))
+        print("Name is {}".format(name))
         if not os.path.isfile(filename):
             return None
         with open(filename, "rU") as propFile:
