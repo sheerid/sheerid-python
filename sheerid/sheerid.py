@@ -221,7 +221,7 @@ class SheerID:
         return "%s/rest/%s%s" % (self.base_url, self.target_version, path)
 
     @classmethod
-    def load_instance(cls, name, verbose=False, insecure=False):
+    def load_instance(cls, name, verbose=False, insecure=False, target_version="0.5"):
         names = name.split(":")
         master = names[0]
         puppet = None
@@ -256,7 +256,7 @@ class SheerID:
                 except IOError:
                     access_token += ('/' + puppet)
 
-            return SheerID(access_token, base_url, verbose=verbose, insecure=insecure)
+            return SheerID(access_token, base_url, target_version=target_version, verbose=verbose, insecure=insecure)
         except KeyError:
             return None
 
