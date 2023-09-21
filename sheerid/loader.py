@@ -27,7 +27,7 @@ class PropLoader:
         filename = "{0}/.sheerid.d/{1}".format(os.environ.get("HOME"), name)
         if not os.path.isfile(filename):
             return None
-        with open(filename, "rU") as propFile:
+        with open(filename, "r") as propFile:
             propDict = dict()
             for propLine in propFile:
                 if propLine[0] == '#':
