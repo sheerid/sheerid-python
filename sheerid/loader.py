@@ -41,7 +41,7 @@ class PropLoader:
 
     @classmethod
     def load_props_file(cls):
-        with open(os.environ.get("HOME") + "/.sheerid", "rU") as propFile:
+        with open(os.environ.get("HOME") + "/.sheerid", "r") as propFile:
             dicts = dict()
             for propLine in propFile:
                 if propLine[0] == '[':
